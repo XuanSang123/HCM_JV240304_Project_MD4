@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" media="all"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+
+    <title>Trang chủ</title>
+</head>
+<body>
+<header id="header" class="header">
+    <div class="header-container">
+        <div class="header-contact">
+            <p>Hotline <strong>038 8892 447</strong></p>
+        </div>
+
+        <div class="user-items">
+            <ul class="user-details">
+                <li th:if="${session.userLogin != null}">
+            <span>
+                <i class="fa fa-user"></i> Xin chào, <strong th:text="${session.userLogin.username}"></strong>
+            </span>
+                </li>
+                <li th:if="${session.userLogin == null}">
+                    <a th:href="@{/login}" class="login-link">
+                        <i class="fa fa-user"></i> Đăng nhập/ đăng ký
+                    </a>
+                </li>
+                <li th:if="${session.userLogin != null}">
+                    <a th:href="@{/cart}" class="cart-link">
+                        <i class="fa fa-shopping-cart"></i> Giỏ hàng
+                    </a>
+                </li>
+
+                <li th:if="${session.userLogin != null}">
+                    <a th:href="@{/orders/history}" class="history-link">
+                        <i class="fa fa-history"></i> Lịch sử đơn hàng
+                    </a>
+                </li>
+                <li th:if="${session.userLogin != null}">
+                    <a th:href="@{/logout}" class="logout-link">
+                        <i class="fa fa-sign-out"></i> Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    <div class="nav">
+        <div class="main-logo">
+            <a th:href="@{/}"><p>Cửa hàng Bàn Ghế</p></a>
+        </div>
+        <div class="navbar">
+            <div id="main-nav" class="stellarnav">
+                <ul class="menu-list">
+                    <li class="menu-item">
+                        <a th:href="@{/}" class="item-anchor active">Trang chủ<i class="icon icon-chevron-down"></i></a>
+                    </li>
+                    <li class="menu-item">
+                        <a th:href="@{/product-room}" class="item-anchor">Bàn ghế hiện đại<i
+                                class="icon icon-chevron-down"></i></a>
+
+                    </li>
+                    <li class="menu-item">
+                        <a th:href="@{/product-table}" class="item-anchor">Bàn ghế Vintage<i
+                                class="icon icon-chevron-down"></i></a>
+
+                    </li>
+
+
+                    <li class="menu-item">
+                        <a th:href="@{/contact}" class="item-anchor">Liên hệ<i class="icon icon-chevron-down"></i></a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+</header>
+</body>
+</html>

@@ -1,0 +1,77 @@
+public void addItemToCart(User user, Product product, int quantity) {
+    CartItem cartItem = new CartItem(user, product, quantity);
+    cartItem.setTotalPrice(product.getPrice() * quantity); // Tính tổng giá
+    cartItemRepository.save(cartItem); // Lưu giỏ hàng vào cơ sở dữ liệu
+}
+
+
+
+public Order createOrderFromCart(User user) {
+    Order order = new Order();
+    order.setUser(user);
+    order.setTotalPrice(BigDecimal.ZERO); // Khởi tạo tổng giá
+
+    // Lấy danh sách sản phẩm trong giỏ hàng
+    List<CartItem> cartItems = cartItemRepository.findByUser(user);
+
+    for (CartItem cartItem : cartItems) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProduct(cartItem.getProduct());
+        orderItem.setQuantity(cartItem.getQuantity());
+        orderItem.setPrice(cartItem.getTotalPrice()); // Lưu giá
+        order.getOrderItems().add(orderItem); // Thêm sản phẩm vào đơn hàng
+
+        // Cập nhật tổng giá đơn hàng
+        order.setTotalPrice(order.getTotalPrice().add(BigDecimal.valueOf(cartItem.getTotalPrice())));
+    }
+
+    // Lưu đơn hàng vào cơ sở dữ liệu
+    orderRepository.save(order);
+
+    // Xóa các sản phẩm trong giỏ hàng sau khi đặt hàng thành công
+    cartItemRepository.deleteByUser(user);
+
+    return order; // Trả về đơn hàng đã tạo
+}
+
+
+public List<Order> getOrderHistory(User user) {
+    return orderRepository.findByUser(user); // Trả về danh sách đơn hàng của người dùng
+}
+
+
+@RestController
+@RequestMapping("/cart")
+public class CartController {
+
+    @Autowired
+    private CartService cartService;
+
+    @Autowired
+    private OrderService orderService;
+
+    // Thêm sản phẩm vào giỏ hàng
+    @PostMapping("/add")
+    public ResponseEntity<?> addProductToCart(@RequestBody CartItemDto cartItemDto) {
+        User user = userService.findById(cartItemDto.getUserId());
+        Product product = productService.findById(cartItemDto.getProductId());
+        cartService.addItemToCart(user, product, cartItemDto.getQuantity());
+        return ResponseEntity.ok("Product added to cart");
+    }
+
+    // Đặt hàng
+    @PostMapping("/checkout")
+    public ResponseEntity<?> checkout(@RequestParam Integer userId) {
+        User user = userService.findById(userId);
+        Order order = orderService.createOrderFromCart(user);
+        return ResponseEntity.ok("Order created with ID: " + order.getId());
+    }
+
+    // Xem lịch sử đơn hàng
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<Order>> getOrderHistory(@PathVariable Integer userId) {
+        User user = userService.findById(userId);
+        List<Order> orders = orderService.getOrderHistory(user);
+        return ResponseEntity.ok(orders);
+    }
+}
